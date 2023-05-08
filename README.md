@@ -1,2 +1,2 @@
-# OSSNA23Demo
-The demo to benchmark energy consumption of FMaaS with GPU energy conservation.
+# greenfmaas-demo
+The deployment files and documentations to deploy cloud native fmaas systems and evaluate energy consumptions.

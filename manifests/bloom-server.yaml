@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bloom-server
+spec:
+  selector:
+    matchLabels:
+      app: bloom
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: bloom
+    spec:
+      containers:
+      - name: bloom
+        image: quay.io/chenw615/bloom:latest
+        resources:
+          limits:
+            nvidia.com/gpu: "1"
+          requests:
+            nvidia.com/gpu: "1"
+        ports:
+        - containerPort: 5001
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: bloom-service
+  labels:
+    app: bloom
+spec:
+  type: ClusterIP
+  ports:
+  - name: http
+    port: 5001
+    targetPort: 5001
+    protocol: TCP
+  selector:
+    app: bloom
