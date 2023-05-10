@@ -177,4 +177,6 @@ for 32 batch size would increase significantly as shown below.
 
 ### References
 1. BLOOM prompts are generated from [reddit dataset](https://github.com/minimaxir/textgenrnn/blob/master/datasets/reddit_rarepuppers_politics_2000_context.csv).
-2. Stable diffusion prompts are from [Gustavosta/Stable-Diffusion-Prompts](https://huggingface.co/datasets/Gustavosta/Stable-Diffusion-Prompts)
+2. Stable diffusion prompts are from [Gustavosta/Stable-Diffusion-Prompts](https://huggingface.co/datasets/Gustavosta/Stable-Diffusion-Prompts).
+3. The full demo video is [here](https://www.youtube.com/watch?v=tpNdXZRQBMI).
+4. The slides for the talk is [here](https://docs.google.com/presentation/d/187KrP5JIh6m9-5nD-pIiHkv7Tl0xznBg/edit?usp=sharing&ouid=108627907206289814808&rtpof=true&sd=true).
