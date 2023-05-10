@@ -13,8 +13,8 @@ spec:
         app: stable-diffusion
     spec:
       containers:
-      - name: bloom
-        image: quay.io/chenw615/stable-diffusion-ui:latest
+      - name: stablediffusion
+        image: quay.io/chenw615/stable-diffusion-web-ui-api:latest
         resources:
           limits:
             nvidia.com/gpu: "1"
