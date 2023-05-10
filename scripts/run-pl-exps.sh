@@ -7,7 +7,7 @@ venv_path="/home/chenw/venvs/bloom-load-generator"
 source "$venv_path/bin/activate"
 
 # Define the energy levels
-declare -a energy_levels=("100W" "150W" "200W" "250W")
+declare -a energy_levels=("100W" "125W" "150W" "175W" "200W" "225W" "250W")
 
 # Define the script path
 script_path="bloom-generate-query.py"
@@ -24,7 +24,7 @@ for energy_level in "${energy_levels[@]}"; do
     sudo nvidia-smi -pl "$energy_level"
 
     # Run the Python script with the current energy_level
-    exp_name="exp-${energy_level}"
+    exp_name="PL-${energy_level}"
     echo "Running script with --exp-name=$exp_name"
     python3 "$script_path" --host localhost --port 5001 --exp-name "$exp_name" --metric-endpoint http://localhost:9090
 done

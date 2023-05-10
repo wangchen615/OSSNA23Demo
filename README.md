@@ -174,6 +174,7 @@ for 32 batch size would increase significantly as shown below.
 3. From the DCGM dashboard, we can see the power consumption for GPU 1 is around 100W and the frequency of GPU 
 0 is around 300 MHz.
 ![alt text](./docs/gpu-power.png "Screenshot for GPU power and frequency Changes")
+
 ### References
 1. BLOOM prompts are generated from [reddit dataset](https://github.com/minimaxir/textgenrnn/blob/master/datasets/reddit_rarepuppers_politics_2000_context.csv).
 2. Stable diffusion prompts are from [Gustavosta/Stable-Diffusion-Prompts](https://huggingface.co/datasets/Gustavosta/Stable-Diffusion-Prompts)

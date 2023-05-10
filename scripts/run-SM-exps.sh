@@ -10,7 +10,7 @@ source "$venv_path/bin/activate"
 declare -a sm_levels=("150" "270" "390" "510" "630" "750" "870" "990" "1110" "1230" "1380")
 
 # Define the script path
-script_path="bloom-generate-query.py"
+script_path="bloom-generate-fixed-token-query.py"
 
 # Check if the script file exists
 if [ ! -f "$script_path" ]; then
@@ -24,7 +24,7 @@ for sm_level in "${sm_levels[@]}"; do
     sudo nvidia-smi -i 0 -ac "877,$sm_level"
 
     # Run the Python script with the current energy_level
-    exp_name="SM-${sm_level}"
+    exp_name="SM2-${sm_level}"
     echo "Running script with --exp-name=$exp_name"
     python3 "$script_path" --host localhost --port 5001 --exp-name "$exp_name" --metric-endpoint http://localhost:9090 --num-tests 20
 done
