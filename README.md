@@ -1,5 +1,5 @@
 # Tutorial for Demo for Open Source Summit NA 2023
-### Title: 5 Steps to Deploy Cloud Native Sustainable Foundation AI Models
+### Title: [5 Steps to Deploy Cloud Native Sustainable Foundation AI Models](https://docs.google.com/presentation/d/187KrP5JIh6m9-5nD-pIiHkv7Tl0xznBg/edit?usp=sharing&ouid=108627907206289814808&rtpof=true&sd=true)
 #### Speakers: Chen Wang, IBM & Huamin Chen, Red Hat
 The repo contains Kubernetes deployment files and documentations to deploy cloud native foundational model systems, including
 [BLOOM Inference server](https://github.com/huggingface/transformers-bloom-inference ) and 
@@ -27,6 +27,7 @@ BLOOM has been trained on 46 different languages and 13 programming languages.
 trained on 512x512 images from a subset of the LAION-5B database. It can be used to generate images from text prompts.
 
 2. Build container image for BLOOM inference server.
+
 a) Clone the open source BLOOM inference server code.
 ```bash
 > git clone https://github.com/huggingface/transformers-bloom-inference
@@ -39,6 +40,7 @@ b) Build your own docker image for the bloom inference server and push to your o
 ```
 
 3. Build container image for Stable-Diffusion server.
+
 a) Similarly, we clone the open sourced docker version of Stable diffusion server.
 ```bash
 > git clone https://github.com/AbdBarho/stable-diffusion-webui-docker.git
@@ -77,6 +79,7 @@ c) Build and push you own stable diffusion server image. Replace <img_repo> to y
 ```
 3. Forward the ports to localhosts of load-testing server for both FM services, prometheus endpoint and grafana for 
 load testing purposes and detach the screen using `^+A+D`.
+
 a) BLOOM Server
 ```bash
 > screen -S bloom-server
@@ -101,6 +104,7 @@ d) Grafana endpoint
 ### Step 3: Run testing load and Observe Energy Consumptions
 1. Import [Nvidia DCGM exporter dashboard](https://grafana.com/grafana/dashboards/12239-nvidia-dcgm-exporter-dashboard/) to the grafana dashboard.
 2. Open FM service UIs for image or text generation.
+
 a) On the load-testing server, open http://localhost:5001 in your browser to try BLOOM query generation. Try the following query.
 ```text
 Hello, welcome to Open Source Summit 2023 in Vancouver.
@@ -115,6 +119,7 @@ b) On the load-testing server, open http://localhost:7860 in your browser to try
 ![alt text](./docs/stable-diffusion-ui.png "Stable Diffusion Server Web UI")
 
 3. Run FM load generator scripts to generate load on both FM services.
+
 a) Enable Python virtual environment for load-testing purposes.
 ```bash
 > cd OSSNA23Demo
@@ -138,6 +143,7 @@ c) Observe the GPU energy consumption, GPU temperature, GPU frequency changes on
 
 ### Step 4: Tune Nvidia GPU energy conservation knobs to observe the power consumption changes.
 1. Tune Nvidia GPU power capping
+
 a) Show the effective range of GPU power capping
 ```bash
 nvidia-smi -q -d POWER
@@ -147,6 +153,7 @@ b) Configure GPU power capping for stable diffusion GPU. Find the stable diffusi
 > sudo nvidia-smi -i GPU_ID -pl NEW_POWER_LIMIT
 ```
 2. Tune Nvidia GPU graphics CLOCK frequencies.
+
 a) Show the possible frequency setting for GPU graphics and memory.
 ```bash
 nvidia-smi -q -d SUPPORTED_CLOCKS
@@ -158,7 +165,15 @@ nvidia-smi -i GPU_ID -ac MEMORY_CLOCK,GRAPHICS_CLOCK
 
 ### Step 5: Observe the performance and GPU energy consumption changes before and after tuning.
 
-
+1. Take the stable diffusion server running on GPU 1 for example, if we set the power capping to 100W, the performance of
+stable diffusion query doubles as shown in the following screenshot.
+![alt text](./docs/stable-diffusion-performance.png "Screenshot for Stable Diffusion Load Performance Changes")
+2. Then the bloom server runs on GPU 0. We set the GPU graphic CLOCK frequency as 300 MHz, the query response time 
+for 32 batch size would increase significantly as shown below.
+![alt text](./docs/bloom-performance.png "Screenshot for BLOOM Load Performance Changes")
+3. From the DCGM dashboard, we can see the power consumption for GPU 1 is around 100W and the frequency of GPU 
+0 is around 300 MHz.
+![alt text](./docs/gpu-power.png "Screenshot for GPU power and frequency Changes")
 ### References
 1. BLOOM prompts are generated from [reddit dataset](https://github.com/minimaxir/textgenrnn/blob/master/datasets/reddit_rarepuppers_politics_2000_context.csv).
 2. Stable diffusion prompts are from [Gustavosta/Stable-Diffusion-Prompts](https://huggingface.co/datasets/Gustavosta/Stable-Diffusion-Prompts)
