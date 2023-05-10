@@ -7,10 +7,10 @@ venv_path="/home/chenw/venvs/bloom-load-generator"
 source "$venv_path/bin/activate"
 
 # Define the energy levels
-declare -a energy_levels=("100W" "125W" "150W" "175W" "200W" "225W" "250W")
+declare -a sm_levels=("150" "270" "390" "510" "630" "750" "870" "990" "1110" "1230" "1380")
 
 # Define the script path
-script_path="bloom-generate-query.py"
+script_path="bloom-generate-fixed-token-query.py"
 
 # Check if the script file exists
 if [ ! -f "$script_path" ]; then
@@ -19,17 +19,17 @@ if [ ! -f "$script_path" ]; then
 fi
 
 # Iterate through the energy levels
-for energy_level in "${energy_levels[@]}"; do
-    echo "Setting GPU energy conservation level to ${energy_level}W"
-    sudo nvidia-smi -pl "$energy_level"
+for sm_level in "${sm_levels[@]}"; do
+    echo "Setting GPU graphic clock level to ${energy_level}MHz"
+    sudo nvidia-smi -i 0 -ac "877,$sm_level"
 
     # Run the Python script with the current energy_level
-    exp_name="PL-${energy_level}"
+    exp_name="SM2-${sm_level}"
     echo "Running script with --exp-name=$exp_name"
-    python3 "$script_path" --host localhost --port 5001 --exp-name "$exp_name" --metric-endpoint http://localhost:9090
+    python3 "$script_path" --host localhost --port 5001 --exp-name "$exp_name" --metric-endpoint http://localhost:9090 --num-tests 20
 done
 
-echo "Energy Conservation Experiment Execution Completed."
+echo "Graphics CLOCK Tuning Experiment Execution Completed."
 
 # Deactivate the virtual environment
 deactivate

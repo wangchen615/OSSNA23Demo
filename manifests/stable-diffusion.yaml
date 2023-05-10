@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: stable-diffusion
+spec:
+  selector:
+    matchLabels:
+      app: stable-diffusion
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: stable-diffusion
+    spec:
+      containers:
+      - name: stablediffusion
+        image: quay.io/chenw615/stable-diffusion-web-ui-api:latest
+        resources:
+          limits:
+            nvidia.com/gpu: "1"
+          requests:
+            nvidia.com/gpu: "1"
+        ports:
+        - containerPort: 7860
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: stable-diffusion
+  labels:
+    app: stable-diffusion
+spec:
+  type: ClusterIP
+  ports:
+  - name: http
+    port: 7860
+    targetPort: 7860
+    protocol: TCP
+  selector:
+    app: stable-diffusion

@@ -71,12 +71,13 @@ def main():
     output_dir = args.output_dir
     exp_name = args.exp_name
 
-    batch_sizes = [2 ** i for i in range(6)]
+    batch_sizes = [32]
     num_tests = args.num_tests
-    num_tokens = [20*i for i in range(1, 11)]
+    num_tokens = [200]
 
     # All results
     latency_results = np.zeros((len(num_tokens), len(batch_sizes), num_tests))
+    e2e_latency_results = np.zeros((len(num_tokens), len(batch_sizes), num_tests))
     energy_results = np.zeros((len(num_tokens), len(batch_sizes)))
     freq_results = np.zeros((len(num_tokens), len(batch_sizes)))
     util_results = np.zeros((len(num_tokens), len(batch_sizes)))
@@ -94,27 +95,35 @@ def main():
     # Read the prompts from the dataset file
     all_records = get_datasets(dataset_file)
 
-    for num_token in num_tokens:
-        for batch_size in batch_sizes:
-            batch_idx = int(math.log2(batch_size))
-            token_idx = int(num_token / 20 - 1)
+    for token_idx, num_token in enumerate(num_tokens):
+        for batch_idx, batch_size in enumerate(batch_sizes):
             before_energy = get_metrics(prom, total_energy_consumption_query)
             start_time = time.time()
             for i in range(num_tests):
                 prompts = get_prompts(all_records, batch_size)
+                before_query_time = time.time()
                 result = generate(url, prompts, num_token)
-                print("The total time taken for {} queries is {}".format(batch_size, result['total_time_taken']))
+                query_total_time = time.time() - before_query_time
+                print("The query time for {} batch size is {}".format(batch_size, result['total_time_taken']))
+                print("The total query time including queueing time for {} batch size if {}".format(batch_size, query_total_time))
                 per_query_latency_value = float(result['total_time_taken'].split(' ')[0]) / batch_size
                 print("The per query latency is {}".format(per_query_latency_value))
 
                 # Record the latency and energy consumption results
                 latency_results[token_idx][batch_idx][i] = per_query_latency_value
+                e2e_latency_results[token_idx][batch_idx][i] = query_total_time
+
+            query_time = time.time() - start_time
+            print("The total time taken for {} queries is {}".format(num_tests, query_time))
+
+            # Wait until the prometheus energy query refreshes the data
+            if query_time < 15:
+                time.sleep(15)
             after_energy = get_metrics(prom, total_energy_consumption_query)
             delta_energy = int(after_energy[0]['value'][1]) - int(before_energy[0]['value'][1])
             print("The total energy consumption for {} queries is {}".format(batch_size, delta_energy))
             energy_results[token_idx][batch_idx] = delta_energy
-            query_time = time.time() - start_time
-            print("The total time taken for {} queries is {}".format(num_tests, query_time))
+
 
             gpu_frequency = get_metrics(prom, gpu_frequency_query)
             ave_gpu_frequency_val = float(gpu_frequency[0]['value'][1])
@@ -132,7 +141,9 @@ def main():
 
     # Calculate the mean of num_tests for each batch size and token size and save the results
     latency_results_mean = np.mean(latency_results, axis=-1)
+    e2e_latency_results_mean = np.mean(e2e_latency_results, axis=-1)
     np.savetxt(output_dir + exp_name + '-latency_mean.csv', latency_results_mean, delimiter=",")
+    np.savetxt(output_dir + exp_name + '-e2e-latency_mean.csv', e2e_latency_results_mean, delimiter=",")
     np.savetxt(output_dir + exp_name + '-energy_total.csv', energy_results, delimiter=",")
     np.savetxt(output_dir + exp_name + '-GPU_freq.csv', freq_results, delimiter=",")
     np.savetxt(output_dir + exp_name + '-GPU_util.csv', util_results, delimiter=",")
